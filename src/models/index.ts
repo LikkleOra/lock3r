@@ -131,3 +131,12 @@ export interface AnalyticsEngine {
   getWeeklyReport(): Promise<FocusMetrics>;
   getRecommendations(): Promise<string[]>;
 }
+
+// Re-export validation functions
+export * from './validation';
+
+// Re-export transformation utilities
+export * from './transformers';
+
+// Re-export type guards and utility types
+export * from './guards';

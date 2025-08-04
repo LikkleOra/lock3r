@@ -4,6 +4,8 @@ import './globals.css';
 import { ConvexProvider } from 'convex/react';
 import convex from '@/lib/convex/client';
 import { PWAProvider } from '@/components/providers/PWAProvider';
+import { Header } from '@/components/navigation/Header';
+import { Footer } from '@/components/navigation/Footer';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -47,8 +49,12 @@ export default function RootLayout({
       <body className={inter.className}>
         <ConvexProvider client={convex}>
           <PWAProvider>
-            <div className="min-h-screen bg-background">
-              {children}
+            <div className="min-h-screen bg-background flex flex-col">
+              <Header />
+              <main className="flex-1">
+                {children}
+              </main>
+              <Footer />
             </div>
           </PWAProvider>
         </ConvexProvider>
