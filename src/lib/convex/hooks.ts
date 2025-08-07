@@ -11,10 +11,11 @@ import {
   UserStats,
   Challenge 
 } from "@/models";
+import { isConvexConfigured } from "./client";
 
 // User hooks
 export function useUser(userId: string) {
-  const user = useQuery(api.users.getUser, { userId });
+  const user = isConvexConfigured() ? useQuery(api.users.getUser, { userId }) : null;
   const getOrCreateUser = useMutation(api.users.getOrCreateUser);
   const updateSettings = useMutation(api.users.updateUserSettings);
   const updateStats = useMutation(api.users.updateUserStats);
@@ -22,39 +23,41 @@ export function useUser(userId: string) {
 
   return {
     user,
-    getOrCreateUser: () => getOrCreateUser({ userId }),
+    getOrCreateUser: () => isConvexConfigured() ? getOrCreateUser({ userId }) : Promise.resolve(null),
     updateSettings: (settings: Partial<UserSettings>) => 
-      updateSettings({ userId, settings }),
+      isConvexConfigured() ? updateSettings({ userId, settings }) : Promise.resolve(null),
     updateStats: (stats: Partial<UserStats>) => 
-      updateStats({ userId, stats }),
+      isConvexConfigured() ? updateStats({ userId, stats }) : Promise.resolve(null),
     incrementStats: (focusTime?: number, sessionsCompleted?: number, challengesCompleted?: number) =>
-      incrementStats({ userId, focusTime, sessionsCompleted, challengesCompleted }),
+      isConvexConfigured() ? incrementStats({ userId, focusTime, sessionsCompleted, challengesCompleted }) : Promise.resolve(null),
   };
 }
 
 // Block list hooks
 export function useBlockList(userId: string) {
-  const blockList = useQuery(api.blocks.getBlockList, { userId });
-  const blockStats = useQuery(api.blocks.getBlockStats, { userId });
+  const blockList = isConvexConfigured() ? useQuery(api.blocks.getBlockList, { userId }) : null;
+  const blockStats = isConvexConfigured() ? useQuery(api.blocks.getBlockStats, { userId }) : null;
   const saveBlockList = useMutation(api.blocks.saveBlockList);
   const addBlockItem = useMutation(api.blocks.addBlockItem);
   const removeBlockItem = useMutation(api.blocks.removeBlockItem);
   const togglePermanent = useMutation(api.blocks.togglePermanentBlock);
   const updateAccess = useMutation(api.blocks.updateBlockItemAccess);
-  const checkBlocked = useQuery(api.blocks.isUrlBlocked, { userId, url: "" }); // Will be called with actual URL
 
   return {
     blockList,
     blockStats,
-    saveBlockList: (items: BlockItem[]) => saveBlockList({ userId, items }),
+    saveBlockList: (items: BlockItem[]) => 
+      isConvexConfigured() ? saveBlockList({ userId, items }) : Promise.resolve(null),
     addBlock: (url: string, isPermanent?: boolean, category?: string) =>
-      addBlockItem({ userId, url, isPermanent, category }),
-    removeBlock: (itemId: string) => removeBlockItem({ userId, itemId }),
-    togglePermanent: (itemId: string) => togglePermanent({ userId, itemId }),
-    updateAccess: (itemId: string) => updateAccess({ userId, itemId }),
+      isConvexConfigured() ? addBlockItem({ userId, url, isPermanent, category }) : Promise.resolve(null),
+    removeBlock: (itemId: string) => 
+      isConvexConfigured() ? removeBlockItem({ userId, itemId }) : Promise.resolve(null),
+    togglePermanent: (itemId: string) => 
+      isConvexConfigured() ? togglePermanent({ userId, itemId }) : Promise.resolve(null),
+    updateAccess: (itemId: string) => 
+      isConvexConfigured() ? updateAccess({ userId, itemId }) : Promise.resolve(null),
     isBlocked: (url: string) => {
-      // This would need to be called separately with the URL
-      return useQuery(api.blocks.isUrlBlocked, { userId, url });
+      return isConvexConfigured() ? useQuery(api.blocks.isUrlBlocked, { userId, url }) : null;
     },
   };
 }

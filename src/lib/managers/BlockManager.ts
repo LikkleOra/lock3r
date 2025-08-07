@@ -24,11 +24,13 @@ import {
   getCurrentTimestamp
 } from '@/lib/utils';
 import { BLOCK_LIST, PERFORMANCE } from '@/lib/constants';
+import { analyticsEngine } from '@/lib/analytics/AnalyticsEngine';
 
 export class BlockManager implements IBlockManager {
   private blockList: BlockList | null = null;
   private lastLoadTime: number = 0;
   private urlPatternCache: Map<string, boolean> = new Map();
+  private temporaryUnlocks: Map<string, number> = new Map(); // URL -> unlock until timestamp
 
   constructor() {
     this.loadBlockList();
@@ -243,6 +245,11 @@ export class BlockManager implements IBlockManager {
       return false;
     }
 
+    // Check for temporary unlock first
+    if (this.hasTemporaryUnlock(url)) {
+      return false;
+    }
+
     // Check cache first for performance
     const cacheKey = normalizeUrl(url);
     if (this.urlPatternCache.has(cacheKey)) {
@@ -259,6 +266,12 @@ export class BlockManager implements IBlockManager {
 
       // Cache the result
       this.urlPatternCache.set(cacheKey, isBlocked);
+      
+      // Track block attempt in analytics
+      if (isBlocked) {
+        const blockItem = blockList.items.find(item => this.matchesBlockPattern(url, item));
+        analyticsEngine.trackBlockAttempt(url, true, blockItem);
+      }
       
       // Limit cache size to prevent memory issues
       if (this.urlPatternCache.size > 1000) {
@@ -516,6 +529,81 @@ export class BlockManager implements IBlockManager {
       data: importedCount,
       error: errors.length > 0 ? errors.join('; ') : undefined
     };
+  }
+
+  // Add temporary unlock for a URL
+  async addTemporaryUnlock(url: string, unlockUntil: number): Promise<void> {
+    const normalizedUrl = normalizeUrl(url);
+    this.temporaryUnlocks.set(normalizedUrl, unlockUntil);
+    
+    // Clean up expired unlocks
+    this.cleanupExpiredUnlocks();
+    
+    // Clear cache for this URL since it's now unlocked
+    this.urlPatternCache.delete(normalizedUrl);
+  }
+
+  // Set temporary unlock (alias for addTemporaryUnlock for compatibility)
+  async setTemporaryUnlock(url: string, unlockUntil: number): Promise<void> {
+    return this.addTemporaryUnlock(url, unlockUntil);
+  }
+
+  // Check if URL has temporary unlock
+  private hasTemporaryUnlock(url: string): boolean {
+    const normalizedUrl = normalizeUrl(url);
+    const unlockUntil = this.temporaryUnlocks.get(normalizedUrl);
+    
+    if (!unlockUntil) {
+      return false;
+    }
+    
+    // Check if unlock has expired
+    if (Date.now() > unlockUntil) {
+      this.temporaryUnlocks.delete(normalizedUrl);
+      return false;
+    }
+    
+    return true;
+  }
+
+  // Clean up expired temporary unlocks
+  private cleanupExpiredUnlocks(): void {
+    const now = Date.now();
+    for (const [url, unlockUntil] of this.temporaryUnlocks.entries()) {
+      if (now > unlockUntil) {
+        this.temporaryUnlocks.delete(url);
+        // Clear cache for expired unlock
+        this.urlPatternCache.delete(url);
+      }
+    }
+  }
+
+  // Get temporary unlock info for a URL
+  getTemporaryUnlockInfo(url: string): { isUnlocked: boolean; unlockUntil?: number } {
+    const normalizedUrl = normalizeUrl(url);
+    const unlockUntil = this.temporaryUnlocks.get(normalizedUrl);
+    
+    if (!unlockUntil || Date.now() > unlockUntil) {
+      return { isUnlocked: false };
+    }
+    
+    return { isUnlocked: true, unlockUntil };
+  }
+
+  // Remove temporary unlock
+  removeTemporaryUnlock(url: string): void {
+    const normalizedUrl = normalizeUrl(url);
+    this.temporaryUnlocks.delete(normalizedUrl);
+    this.urlPatternCache.delete(normalizedUrl);
+  }
+
+  // Get all active temporary unlocks
+  getActiveTemporaryUnlocks(): Array<{ url: string; unlockUntil: number }> {
+    this.cleanupExpiredUnlocks();
+    return Array.from(this.temporaryUnlocks.entries()).map(([url, unlockUntil]) => ({
+      url,
+      unlockUntil
+    }));
   }
 }
 

@@ -1,0 +1,40 @@
+// Mock Convex API - replace with actual generated file when Convex is set up
+export const api = {
+  users: {
+    getUser: 'users:getUser',
+    getOrCreateUser: 'users:getOrCreateUser',
+    updateUserSettings: 'users:updateUserSettings',
+    updateUserStats: 'users:updateUserStats',
+    incrementUserStats: 'users:incrementUserStats',
+    deleteUser: 'users:deleteUser',
+  },
+  blocks: {
+    getBlockList: 'blocks:getBlockList',
+    saveBlockList: 'blocks:saveBlockList',
+    addBlockItem: 'blocks:addBlockItem',
+    removeBlockItem: 'blocks:removeBlockItem',
+    togglePermanentBlock: 'blocks:togglePermanentBlock',
+    updateBlockItemAccess: 'blocks:updateBlockItemAccess',
+    isUrlBlocked: 'blocks:isUrlBlocked',
+    getBlockStats: 'blocks:getBlockStats',
+  },
+  sessions: {
+    createFocusSession: 'sessions:createFocusSession',
+    getActiveFocusSession: 'sessions:getActiveFocusSession',
+    updateSessionProgress: 'sessions:updateSessionProgress',
+    endFocusSession: 'sessions:endFocusSession',
+    pauseFocusSession: 'sessions:pauseFocusSession',
+    resumeFocusSession: 'sessions:resumeFocusSession',
+    getFocusSessionHistory: 'sessions:getFocusSessionHistory',
+    getFocusSessionStats: 'sessions:getFocusSessionStats',
+    cleanupOldSessions: 'sessions:cleanupOldSessions',
+  },
+  challenges: {
+    recordChallengeAttempt: 'challenges:recordChallengeAttempt',
+    getChallengeHistory: 'challenges:getChallengeHistory',
+    getChallengeStats: 'challenges:getChallengeStats',
+    getChallengeTrends: 'challenges:getChallengeTrends',
+    cleanupOldChallenges: 'challenges:cleanupOldChallenges',
+    getRecentFailedChallenges: 'challenges:getRecentFailedChallenges',
+  },
+} as const;

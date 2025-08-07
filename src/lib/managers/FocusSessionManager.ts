@@ -8,6 +8,7 @@ import {
 import { storage } from '@/lib/storage';
 import { generateId, getCurrentTimestamp, calculatePercentage } from '@/lib/utils';
 import { FOCUS_SESSION } from '@/lib/constants';
+import { analyticsEngine } from '@/lib/analytics/AnalyticsEngine';
 
 export class FocusSessionManager implements IFocusSessionManager {
   private activeSession: FocusSession | null = null;
@@ -136,6 +137,9 @@ export class FocusSessionManager implements IFocusSessionManager {
 
     storage.clearActiveFocusSession();
     await storage.addToSessionHistory(endedSession);
+
+    // Track session completion in analytics
+    analyticsEngine.trackFocusSession(endedSession);
 
     this.activeSession = null;
     return endedSession;
