@@ -1,13 +1,15 @@
 {
-  "name": "FocusGuardian - Your Digital Accountability Partner",
+  "name": "FocusGuardian",
   "short_name": "FocusGuardian",
-  "description": "Stay focused and build better digital habits with your accountability partner",
+  "description": "Your AI-powered accountability partner for focused productivity",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#ffffff",
   "theme_color": "#3b82f6",
   "orientation": "portrait-primary",
-  "categories": ["productivity", "lifestyle"],
+  "categories": ["productivity", "utilities"],
+  "lang": "en",
+  "dir": "ltr",
   "icons": [
     {
       "src": "/icons/icon-72x72.png",
@@ -62,16 +64,42 @@
     {
       "name": "Start Focus Session",
       "short_name": "Focus",
-      "description": "Quickly start a new focus session",
-      "url": "/dashboard?action=start-session",
-      "icons": [{ "src": "/icons/shortcut-focus.png", "sizes": "96x96" }]
+      "description": "Start a new focus session",
+      "url": "/focus",
+      "icons": [
+        {
+          "src": "/icons/focus-shortcut.png",
+          "sizes": "96x96"
+        }
+      ]
     },
     {
-      "name": "Manage Block List",
-      "short_name": "Blocks",
-      "description": "Manage your blocked sites",
-      "url": "/block-list",
-      "icons": [{ "src": "/icons/shortcut-blocks.png", "sizes": "96x96" }]
+      "name": "View Analytics",
+      "short_name": "Analytics",
+      "description": "View your productivity analytics",
+      "url": "/analytics",
+      "icons": [
+        {
+          "src": "/icons/analytics-shortcut.png",
+          "sizes": "96x96"
+        }
+      ]
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "/screenshots/desktop-dashboard.png",
+      "sizes": "1280x720",
+      "type": "image/png",
+      "form_factor": "wide",
+      "label": "FocusGuardian Dashboard"
+    },
+    {
+      "src": "/screenshots/mobile-focus.png",
+      "sizes": "390x844",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "Focus Session on Mobile"
     }
   ]
 }

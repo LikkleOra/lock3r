@@ -64,7 +64,7 @@ export function PWAProvider({ children }: PWAProviderProps) {
     const registerServiceWorker = async () => {
       if ('serviceWorker' in navigator) {
         try {
-          const reg = await navigator.serviceWorker.register('/service-worker.js');
+          const reg = await navigator.serviceWorker.register('/sw.js');
           setRegistration(reg);
 
           // Check for updates
