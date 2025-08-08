@@ -1,0 +1,7 @@
+{
+  "/_not-found": "app/_not-found.js",
+  "/analytics/page": "app/analytics/page.js",
+  "/block-list/page": "app/block-list/page.js",
+  "/focus/page": "app/focus/page.js",
+  "/page": "app/page.js"
+}
